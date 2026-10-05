@@ -62,9 +62,9 @@ class ClaseControllerTest {
 	void crearDevuelve201ConLocation() throws Exception {
 		given(claseService.crear(any(ClaseRequest.class))).willReturn(respuesta());
 
-		mockMvc.perform(post("/api/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
+		mockMvc.perform(post("/api/estudiante/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
 				.andExpect(status().isCreated())
-				.andExpect(header().string("Location", "/api/clases/10"))
+				.andExpect(header().string("Location", "/api/estudiante/clases/10"))
 				.andExpect(jsonPath("$.id").value(10))
 				.andExpect(jsonPath("$.codigo").value("ISIS-1101"))
 				.andExpect(jsonPath("$.usuarioId").value(1));
@@ -76,7 +76,7 @@ class ClaseControllerTest {
 				{"codigo":"ISIS-1101","nombre":"Algoritmos","creditos":0,"usuarioId":1}
 				""";
 
-		mockMvc.perform(post("/api/clases").contentType(MediaType.APPLICATION_JSON).content(cuerpo))
+		mockMvc.perform(post("/api/estudiante/clases").contentType(MediaType.APPLICATION_JSON).content(cuerpo))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.status").value(400))
 				.andExpect(jsonPath("$.campos.creditos").exists());
@@ -86,7 +86,7 @@ class ClaseControllerTest {
 
 	@Test
 	void crearSinCamposObligatoriosDevuelve400() throws Exception {
-		mockMvc.perform(post("/api/clases").contentType(MediaType.APPLICATION_JSON).content("{}"))
+		mockMvc.perform(post("/api/estudiante/clases").contentType(MediaType.APPLICATION_JSON).content("{}"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.campos.codigo").exists())
 				.andExpect(jsonPath("$.campos.nombre").exists())
@@ -99,7 +99,7 @@ class ClaseControllerTest {
 		willThrow(new RecursoNoEncontradoException("No existe el usuario con id 1"))
 				.given(claseService).crear(any(ClaseRequest.class));
 
-		mockMvc.perform(post("/api/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
+		mockMvc.perform(post("/api/estudiante/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.status").value(404));
 	}
@@ -109,7 +109,7 @@ class ClaseControllerTest {
 		willThrow(new RecursoDuplicadoException("Ya existe una clase con el código ISIS-1101"))
 				.given(claseService).crear(any(ClaseRequest.class));
 
-		mockMvc.perform(post("/api/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
+		mockMvc.perform(post("/api/estudiante/clases").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
 				.andExpect(status().isConflict())
 				.andExpect(jsonPath("$.status").value(409));
 	}
@@ -118,7 +118,7 @@ class ClaseControllerTest {
 	void listarDevuelve200() throws Exception {
 		given(claseService.listar()).willReturn(List.of(respuesta()));
 
-		mockMvc.perform(get("/api/clases"))
+		mockMvc.perform(get("/api/estudiante/clases"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.length()").value(1))
 				.andExpect(jsonPath("$[0].codigo").value("ISIS-1101"));
@@ -128,7 +128,7 @@ class ClaseControllerTest {
 	void obtenerDevuelve200() throws Exception {
 		given(claseService.obtener(10L)).willReturn(respuesta());
 
-		mockMvc.perform(get("/api/clases/10"))
+		mockMvc.perform(get("/api/estudiante/clases/10"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(10));
 	}
@@ -137,7 +137,7 @@ class ClaseControllerTest {
 	void obtenerInexistenteDevuelve404() throws Exception {
 		given(claseService.obtener(99L)).willThrow(new RecursoNoEncontradoException("No existe la clase con id 99"));
 
-		mockMvc.perform(get("/api/clases/99"))
+		mockMvc.perform(get("/api/estudiante/clases/99"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.message").value("No existe la clase con id 99"));
 	}
@@ -146,7 +146,7 @@ class ClaseControllerTest {
 	void actualizarDevuelve200() throws Exception {
 		given(claseService.actualizar(eq(10L), any(ClaseRequest.class))).willReturn(respuesta());
 
-		mockMvc.perform(put("/api/clases/10").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
+		mockMvc.perform(put("/api/estudiante/clases/10").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(10));
 	}
@@ -156,7 +156,7 @@ class ClaseControllerTest {
 		willThrow(new RecursoNoEncontradoException("No existe la clase con id 99"))
 				.given(claseService).actualizar(eq(99L), any(ClaseRequest.class));
 
-		mockMvc.perform(put("/api/clases/99").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
+		mockMvc.perform(put("/api/estudiante/clases/99").contentType(MediaType.APPLICATION_JSON).content(JSON_VALIDO))
 				.andExpect(status().isNotFound());
 	}
 
@@ -164,7 +164,7 @@ class ClaseControllerTest {
 	void eliminarDevuelve204() throws Exception {
 		doNothing().when(claseService).eliminar(10L);
 
-		mockMvc.perform(delete("/api/clases/10")).andExpect(status().isNoContent());
+		mockMvc.perform(delete("/api/estudiante/clases/10")).andExpect(status().isNoContent());
 
 		verify(claseService).eliminar(10L);
 	}
@@ -174,7 +174,7 @@ class ClaseControllerTest {
 		willThrow(new RecursoNoEncontradoException("No existe la clase con id 99"))
 				.given(claseService).eliminar(99L);
 
-		mockMvc.perform(delete("/api/clases/99")).andExpect(status().isNotFound());
+		mockMvc.perform(delete("/api/estudiante/clases/99")).andExpect(status().isNotFound());
 	}
 
 }

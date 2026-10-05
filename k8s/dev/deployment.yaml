@@ -1,0 +1,133 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: estudiante
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: estudiante
+  namespace: estudiante
+data:
+  DB_HOST: "190.146.2.119"
+  DB_PORT: "2345"
+  DB_NAME: "estudiante"
+  DB_USER: "estudiante"
+  CATALINA_OPTS: "-XX:MaxRAMPercentage=75 -Djava.security.egd=file:/dev/./urandom"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: estudiante
+  namespace: estudiante
+  labels:
+    app: estudiante
+    environment: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: estudiante
+  template:
+    metadata:
+      labels:
+        app: estudiante
+        environment: dev
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: estudiante
+          image: ghcr.io/docsjaveriana/ex-estudiante:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: estudiante
+          env:
+            # Sin valor por defecto en application.properties: si falta el
+            # secret el pod no arranca (CreateContainerConfigError), que es
+            # preferible a arrancar y fallar en la primera consulta.
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: estudiante-secret
+                  key: DB_PASSWORD
+          # No hay Actuator: se comprueba solo que Tomcat acepte conexiones.
+          # Tomcat + Spring + Hibernate tardan en desplegar el WAR, de ahí el
+          # startupProbe generoso (hasta 3 min) antes de activar el liveness.
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+            failureThreshold: 18
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: estudiante
+  namespace: estudiante
+  labels:
+    app: estudiante
+spec:
+  type: ClusterIP
+  selector:
+    app: estudiante
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: estudiante
+  namespace: estudiante
+  annotations:
+    # La aplicación ya sirve todo bajo /api/estudiante (endpoints y Swagger),
+    # así que el Ingress reenvía la ruta tal cual, sin reescribir.
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+spec:
+  ingressClassName: public
+  rules:
+    - host: desarrolloweb.click
+      http:
+        paths:
+          - path: /api/estudiante
+            pathType: Prefix
+            backend:
+              service:
+                name: estudiante
+                port:
+                  number: 80
+    - host: www.desarrolloweb.click
+      http:
+        paths:
+          - path: /api/estudiante
+            pathType: Prefix
+            backend:
+              service:
+                name: estudiante
+                port:
+                  number: 80

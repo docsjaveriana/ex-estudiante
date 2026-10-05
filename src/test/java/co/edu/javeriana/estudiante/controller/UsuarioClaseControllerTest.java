@@ -35,7 +35,7 @@ class UsuarioClaseControllerTest {
 				.build();
 		given(claseService.listarPorUsuario(1L)).willReturn(List.of(clase));
 
-		mockMvc.perform(get("/api/usuarios/1/clases"))
+		mockMvc.perform(get("/api/estudiante/usuarios/1/clases"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.length()").value(1))
 				.andExpect(jsonPath("$[0].usuarioId").value(1));
@@ -46,7 +46,7 @@ class UsuarioClaseControllerTest {
 		given(claseService.listarPorUsuario(99L))
 				.willThrow(new RecursoNoEncontradoException("No existe el usuario con id 99"));
 
-		mockMvc.perform(get("/api/usuarios/99/clases")).andExpect(status().isNotFound());
+		mockMvc.perform(get("/api/estudiante/usuarios/99/clases")).andExpect(status().isNotFound());
 	}
 
 }

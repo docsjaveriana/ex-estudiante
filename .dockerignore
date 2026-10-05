@@ -1,0 +1,12 @@
+target/
+.git/
+.github/
+.idea/
+.vscode/
+.mvn/
+mvnw
+mvnw.cmd
+k8s/
+*.md
+sonar.txt
+.scannerwork/

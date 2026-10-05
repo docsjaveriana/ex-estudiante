@@ -1,0 +1,18 @@
+# Ejecución local de la imagen contra el PostgreSQL del curso.
+#
+#   DB_PASSWORD='...' docker compose up --build
+#
+# Para otra base basta con exportar las variables que cambien.
+services:
+  estudiante:
+    build: .
+    image: ghcr.io/docsjaveriana/ex-estudiante:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: ${DB_HOST:-190.146.2.119}
+      DB_PORT: ${DB_PORT:-2345}
+      DB_NAME: ${DB_NAME:-estudiante}
+      DB_USER: ${DB_USER:-estudiante}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD antes de levantar el servicio}
+    restart: unless-stopped
