@@ -39,4 +39,4 @@ CLAUDE.md
 CLAUDE_TEC.md
 sonar.txt
 
-k8s/de
+k8s/dev/create-secrets.sh
