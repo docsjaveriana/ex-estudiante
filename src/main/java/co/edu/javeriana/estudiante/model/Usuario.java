@@ -15,7 +15,7 @@ import lombok.Setter;
 /**
  * Persona propietaria de un conjunto de clases.
  *
- * <p>No expone endpoints propios: solo se consulta para resolver el dueño de una clase.
+ * <p>Tiene CRUD propio; no se puede eliminar mientras tenga clases asociadas.
  */
 @Entity
 @Table(name = "usuario")

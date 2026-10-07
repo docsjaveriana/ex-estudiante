@@ -27,6 +27,11 @@ public class ManejadorGlobalExcepciones {
 		return construir(HttpStatus.CONFLICT, ex.getMessage(), null);
 	}
 
+	@ExceptionHandler(RecursoEnUsoException.class)
+	public ResponseEntity<ErrorResponse> manejarEnUso(RecursoEnUsoException ex) {
+		return construir(HttpStatus.CONFLICT, ex.getMessage(), null);
+	}
+
 	/** Red de seguridad: una restricción de unicidad violada en carrera también es un 409. */
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ErrorResponse> manejarIntegridad(DataIntegrityViolationException ex) {

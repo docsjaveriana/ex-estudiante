@@ -12,4 +12,6 @@ public interface ClaseRepository extends JpaRepository<Clase, Long> {
 
 	boolean existsByCodigoAndIdNot(String codigo, Long id);
 
+	boolean existsByUsuarioId(Long usuarioId);
+
 }
